@@ -16,7 +16,10 @@ const root = path.resolve(process.cwd(), 'uploads')
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 const allowedOrigins = env.CLIENT_ORIGIN.split(',').map((origin) => origin.trim())
-app.use(cors({ origin: allowedOrigins }))
+app.use(cors({ origin(origin, callback) {
+  if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) return callback(null, true)
+  return callback(new Error('CORS origin is not allowed'))
+} }))
 app.use(express.json({ limit: '1mb' }))
 app.use(morgan('dev'))
 app.use('/uploads', express.static(root))
