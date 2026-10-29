@@ -2,9 +2,11 @@ import { Router } from 'express'
 import multer from 'multer'
 import path from 'node:path'
 import crypto from 'node:crypto'
+import fs from 'node:fs'
 import { requireAuth } from '../middleware/auth.js'
 
-const root = path.resolve(process.cwd(), 'uploads')
+const root = process.env.LAMBDA_TASK_ROOT ? '/tmp/personal-blog-uploads' : path.resolve(process.cwd(), 'uploads')
+fs.mkdirSync(root, { recursive: true })
 const storage = multer.diskStorage({
   destination: root,
   filename: (_req, file, callback) => callback(null, `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname).toLowerCase()}`),

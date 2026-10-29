@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import path from 'node:path'
+import fs from 'node:fs'
 import { env } from './config/env.js'
 import { errorHandler } from './middleware/error.js'
 import authRoutes from './routes/auth.js'
@@ -12,7 +13,8 @@ import uploadRoutes from './routes/uploads.js'
 import userRoutes from './routes/users.js'
 
 export const app = express()
-const root = path.resolve(process.cwd(), 'uploads')
+const root = process.env.LAMBDA_TASK_ROOT ? '/tmp/personal-blog-uploads' : path.resolve(process.cwd(), 'uploads')
+fs.mkdirSync(root, { recursive: true })
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 const allowedOrigins = env.CLIENT_ORIGIN.split(',').map((origin) => origin.trim())
